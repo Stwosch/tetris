@@ -1,0 +1,35 @@
+@import 'mixins/_mixins.scss';
+@import 'variables/_variables.scss';
+
+html {
+	font-size: 62.5%;
+}
+
+body {
+	font-size: 1.6rem;
+}
+
+.board {
+	display: flex;
+	margin: 20rem auto 10rem auto;
+	width: 25rem;
+	flex-wrap: wrap;
+}
+
+.block {
+	box-sizing: border-box;
+	width: $block__size;
+	height: $block__size;
+	border-width: 0.1rem;
+	border-style: solid;
+
+	&__empty {
+		background-color: $block__empty-color;
+		border-color: $block__empty-borderColor;
+	}
+
+	&__o {
+		background-color: $block__o-color;
+		border-color: $block__filled-borderColor;
+	}
+}
