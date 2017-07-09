@@ -1,6 +1,6 @@
 import { DOM } from '../dom-elements';
 import { times } from '../useful-functions';
-import { Block } from '../block';
+import { Block, EmptyBlock } from '../block';
 import { Vector } from '../vector';
 
 export class View {
@@ -50,11 +50,13 @@ export class View {
 
     removeBlock(vectors: Vector[]) {
 
+        const typeOfEmptyBlock = new EmptyBlock().type;
+
         vectors.forEach((vector: Vector) => {
             
             const id = vector.getId();
             const el = this._getBlockById(id);
-            this._addTypeToBlock(el, 'empty');
+            this._addTypeToBlock(el, typeOfEmptyBlock);
 
         });
     }

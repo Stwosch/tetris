@@ -10,8 +10,21 @@ export class Model {
     
     constructor() {}
 
+    private _checkVectorFitArray(array: any[][], vector: Vector) {
+        return vector.y < array.length && vector.y >= 0 && vector.x >= 0 && vector.x < array[0].length;
+    }
+
     private _checkIsPositionFree(positions: Vector[]) {
-        const index: number = positions.findIndex((vector: Vector) => !this._board.area[vector.y][vector.x].value.type );
+        const typeOfEmptyBlock = new EmptyBlock().type;
+        const index: number = positions.findIndex((vector: Vector) => {
+
+            if(this._checkVectorFitArray(this._board.area, vector)) {
+                return this._board.area[vector.y][vector.x].value.type !== typeOfEmptyBlock;
+            } else {
+                return true;
+            }
+        });
+
         return index === -1;
     }
 
@@ -61,15 +74,34 @@ export class Model {
     createBlock() {
         const blockSource: Block = this._randomValueFromArray(this._blocks);
         const block: Block = Object.assign(new Block, blockSource);
-        console.log(blockSource);
-        console.log(block);
         this._saveBlock(block);
         return block;
     }
 
     canDropBlock(positions: Vector[]) {
-        const droppedPositions: Vector[] = positions.map((vector: Vector) => vector.plus(new Vector(0, 1)));
-        return this._checkIsPositionFree(droppedPositions);
+
+        const properVectors: Vector[] = [];
+
+        positions.forEach((vector: Vector) => {
+            
+            const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.x === vector.x);
+
+            if(pVectorIndex === -1) {
+
+                properVectors.push(new Vector(vector.x, vector.y));
+
+            } else {
+
+                if(properVectors[pVectorIndex].y < vector.y) {
+                    properVectors[pVectorIndex].y = vector.y;
+                }
+            }
+
+        });
+        
+        const droppedVectors = properVectors.map((vector: Vector) => vector.plus(new Vector(0, 1)));
+
+        return this._checkIsPositionFree(droppedVectors);
     }
 
     removeBlock(vectors: Vector[]) {

@@ -16,6 +16,14 @@ export class Vector {
         return this._y;
     }
 
+    set x(x: number) {
+        this._x = x;
+    }
+
+    set y(y: number) {
+        this._y = y;
+    }
+
     plus(vector: Vector) {
         return new Vector(this._x + vector.x, this._y + vector.y); 
     }

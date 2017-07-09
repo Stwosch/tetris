@@ -19,7 +19,6 @@ export class Controller {
     private _tryDropBlock(block: Block) {
         
         if(this._model.canDropBlock(block.vectors)) {
-            
             const oldVectors = block.vectors;
             block.vectors = block.getBlockPosition(new Vector(0, 1));
 
@@ -57,8 +56,10 @@ export class Controller {
                 this._tryDropBlock(block);
             } else {
                block = this._createBlock();
-            } 
-        }, 2000);
+            }
+
+            
+        }, 200);
 
         
     }
