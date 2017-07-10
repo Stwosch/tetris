@@ -6,7 +6,7 @@ export class Board {
     
     private _width: number;
     private _height: number;
-    private _area: {value: Block, id: number}[][];
+    private _area: Block[][];
 
     constructor(width: number, height: number) {
         this._width = width;
@@ -34,7 +34,7 @@ export class Board {
     }
 
     setAreaBlock(vector: Vector, block: Block) {
-        this._area[vector.y][vector.x].value = block; 
+        this._area[vector.y][vector.x] = block; 
     }
 
     initArea() {
@@ -44,15 +44,7 @@ export class Board {
         times(this._height, (y: number) => {
 
             this._area.push([]);
-            times(this._width, (x: number) => {
-
-                const id: number = new Vector(x, y).getId();
-                this._area[y].push({
-                   value: new EmptyBlock,
-                   id: id 
-                });
-                    
-            });
+            times(this._width, () => this._area[y].push(new EmptyBlock));
 
         });
     }

@@ -16,24 +16,11 @@ export class View {
         el.className = "block block__" + type;
     }
 
-    renderEmptyTemplate(area: { value: Block, id: number }[][]) {
+    renderAllTemplate(area: Block[][]) {
 
-        const flattened = area.reduce(
-            ( sum: { value: Block, id: number }[], 
-              value: { value: Block, id: number }[] ) => 
-                
-                sum.concat(value), [] 
-        );
-
-        const output = flattened.reduce(
-            ( html: string, 
-              block: { value: Block, id: number } ) => 
-              
-                html += DOM.blockTmpl({
-                    type: block.value.type,
-                    id: block.id
-                }), ""
-        );
+        let id: number = 0;
+        const flattened = area.reduce( (sum: Block[], value: Block[]) => sum.concat(value), [] );
+        const output = flattened.reduce( (html: string, block: Block) => html += DOM.blockTmpl({ type: block.type, id: id++ }), "" );
 
         DOM.board.innerHTML = output;
     }

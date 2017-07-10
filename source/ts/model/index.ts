@@ -9,6 +9,10 @@ export class Model {
     private _blocks: Block[];
     
     constructor() {}
+    
+    get board() {
+        return this._board;
+    }
 
     private _checkVectorFitArray(array: any[][], vector: Vector) {
         return vector.y < array.length && vector.y >= 0 && vector.x >= 0 && vector.x < array[0].length;
@@ -19,7 +23,7 @@ export class Model {
         const index: number = positions.findIndex((vector: Vector) => {
 
             if(this._checkVectorFitArray(this._board.area, vector)) {
-                return this._board.area[vector.y][vector.x].value.type !== typeOfEmptyBlock;
+                return this._board.area[vector.y][vector.x].type !== typeOfEmptyBlock;
             } else {
                 return true;
             }
@@ -150,6 +154,46 @@ export class Model {
 
     addBlock(block: Block) {
         block.vectors.forEach((vector: Vector) => this._board.setAreaBlock(vector, block) );
+    }
+    
+    clearLine() {
+        const typeOfEmptyBlock: string = new EmptyBlock().type;
+        let lineIndex: number = 0;
+        const rowsToDrop: number[] = [];
+        this._board.area.forEach((blocks: Block[]) => {
+            
+            const index = blocks.findIndex((block: Block) => block.type === typeOfEmptyBlock);
+            if(index === -1) {
+                rowsToDrop.push(lineIndex);
+            }
+
+            lineIndex++;
+        });
+
+        if(rowsToDrop.length > 0) {
+
+            const emptyRow: EmptyBlock[] = [];
+            const emptyBlockType: string = new EmptyBlock().type;
+            times(10, () => {
+                emptyRow.push(new EmptyBlock);
+            });
+
+            rowsToDrop.forEach((index: number) => {
+                this._board.area.splice(index, 1);
+                times(index, (y: number) => {
+                    times(this._board.area[0].length, (x: number) => {
+                        if(this._board.area[y][x].type !== emptyBlockType) {
+                            this._board.area[y][x].vectors.forEach((vector: Vector) => vector.y++);
+                        }
+                    });
+                });
+                this._board.area.unshift(emptyRow);
+            });
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
