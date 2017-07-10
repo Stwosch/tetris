@@ -16,11 +16,11 @@ export class Controller {
         this._createdBlock = false;
     }
 
-    private _tryDropBlock(block: Block) {
+    private _tryMoveBlock(block: Block, move: Vector) {
         
-        if(this._model.canDropBlock(block.vectors)) {
+        if(this._model.canDropBlock(block.vectors, move)) {
             const oldVectors = block.vectors;
-            block.vectors = block.getBlockPosition(new Vector(0, 1));
+            block.vectors = block.getBlockPosition(move);
 
             this._model.removeBlock(oldVectors);
             this._model.addBlock(block);
@@ -28,7 +28,7 @@ export class Controller {
             this._view.removeBlock(oldVectors);
             this._view.renderBlock(block);
 
-        } else {
+        } else if (move.y > 0) {
             this._createdBlock = false;
         }
         
@@ -49,17 +49,33 @@ export class Controller {
     private _startGame() {
         
         let block: Block;
+        window.addEventListener('keydown', e => {
+            
+            if(block) {
+                switch(e.keyCode) {
+
+                    case 37: 
+                        this._tryMoveBlock(block, new Vector(-1, 0));
+                    break;
+    
+                    case 39: 
+                        this._tryMoveBlock(block, new Vector(1, 0));
+                    break;
+                }
+            }
+            
+        });
 
         return setInterval(() => {
             
             if(this._createdBlock) {
-                this._tryDropBlock(block);
+                this._tryMoveBlock(block, new Vector(0, 1));
             } else {
                block = this._createBlock();
             }
 
-            
-        }, 200);
+                        
+        }, 500);
 
         
     }

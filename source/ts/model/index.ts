@@ -62,6 +62,61 @@ export class Model {
         this.addBlock(block);
     }
 
+    private _filterProperVectorToMoveDown(properVectors: Vector[], vector: Vector) {
+
+        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.x === vector.x);
+
+        if(pVectorIndex === -1) {
+
+            properVectors.push(new Vector(vector.x, vector.y));
+
+        } else if(properVectors[pVectorIndex].y < vector.y) {
+
+            properVectors[pVectorIndex].y = vector.y;
+        }
+    }
+
+    private _filterProperVectorToMoveRight(properVectors: Vector[], vector: Vector) {
+
+        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.y === vector.y);
+
+        if(pVectorIndex === -1) {
+
+            properVectors.push(new Vector(vector.x, vector.y));
+
+        } else if(properVectors[pVectorIndex].x < vector.x) {
+
+            properVectors[pVectorIndex].x = vector.x;
+        }
+    }
+
+    private _filterProperVectorToMoveLeft(properVectors: Vector[], vector: Vector) {
+
+        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.y === vector.y);
+
+        if(pVectorIndex === -1) {
+
+            properVectors.push(new Vector(vector.x, vector.y));
+
+        } else if(properVectors[pVectorIndex].x > vector.x) {
+
+            properVectors[pVectorIndex].x = vector.x;
+        }
+    }
+
+    private _filterProperVectorToMove(properVectors: Vector[], vector: Vector, move: Vector) {
+
+        if(move.y === 1) {
+            this._filterProperVectorToMoveDown(properVectors, vector);
+        } else if(move.x === 1) {
+            this._filterProperVectorToMoveRight(properVectors, vector);
+        } else if(move.x === -1) {
+            this._filterProperVectorToMoveLeft(properVectors, vector);
+        }
+    }
+
+
+
     saveBoard(board: Board) {
 
         this._board = board;
@@ -78,28 +133,13 @@ export class Model {
         return block;
     }
 
-    canDropBlock(positions: Vector[]) {
+    canDropBlock(positions: Vector[], move: Vector) {
 
         const properVectors: Vector[] = [];
 
-        positions.forEach((vector: Vector) => {
-            
-            const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.x === vector.x);
-
-            if(pVectorIndex === -1) {
-
-                properVectors.push(new Vector(vector.x, vector.y));
-
-            } else {
-
-                if(properVectors[pVectorIndex].y < vector.y) {
-                    properVectors[pVectorIndex].y = vector.y;
-                }
-            }
-
-        });
+        positions.forEach((vector: Vector) => this._filterProperVectorToMove(properVectors, vector, move) );
         
-        const droppedVectors = properVectors.map((vector: Vector) => vector.plus(new Vector(0, 1)));
+        const droppedVectors = properVectors.map((vector: Vector) => vector.plus(move));
 
         return this._checkIsPositionFree(droppedVectors);
     }
