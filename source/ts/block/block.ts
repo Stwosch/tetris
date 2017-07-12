@@ -1,4 +1,4 @@
-import { Vector } from '../vector';
+import { Vector } from '../vector/vector';
 
 export class Block {
 
@@ -6,10 +6,11 @@ export class Block {
     protected _type: string;
     protected _width: number;
     protected _height: number;
+    protected _position: Vector[];
 
     constructor() {}
 
-    getBlockPosition(startPosition: Vector) {
+    getBlockStartPosition(startPosition: Vector) {
         return this._vectors.map((vector: Vector) => vector.plus(startPosition));
     }
 
@@ -21,12 +22,16 @@ export class Block {
         return this._width;
     }
 
-    set vectors(vectors: Vector[]) {
-        this._vectors = vectors;
-    }
-
     get vectors() {
         return this._vectors;
+    }
+
+    get position() {
+        return this._position;
+    }
+
+    set position(vectors: Vector[]) {
+        this._position = vectors;
     }
 }
 

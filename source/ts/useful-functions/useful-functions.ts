@@ -8,3 +8,7 @@ export function times(times: number, fn: any) {
 
     return output;
 }
+
+export function randomValueFromArray(array: any[]) { 
+    return array[Math.floor( Math.random() * array.length )];
+}

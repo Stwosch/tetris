@@ -73,15 +73,16 @@ gulp.task("ts",  () => {
         basedir: '.',
         debug: true,
         entries: [
-			tsBaseDir + 'controller/index.ts',
-			tsBaseDir + 'model/index.ts',
-			tsBaseDir + 'view/index.ts',
+			tsBaseDir + 'controller/controller.ts',
+			tsBaseDir + 'model/model.ts',
+			tsBaseDir + 'view/view.ts',
 			tsBaseDir + 'main.ts',
-			tsBaseDir + 'board/index.ts',
-			tsBaseDir + 'dom-elements/index.ts',
-			tsBaseDir + 'useful-functions/index.ts',
-			tsBaseDir + 'block/index.ts',
-			tsBaseDir + 'vector/index.ts'
+			tsBaseDir + 'board/board.ts',
+			tsBaseDir + 'dom-elements/dom-elements.ts',
+			tsBaseDir + 'useful-functions/useful-functions.ts',
+			tsBaseDir + 'block/block.ts',
+			tsBaseDir + 'vector/vector.ts',
+			tsBaseDir + 'game-components/game-components.ts'
 		],
         cache: {},
         packageCache: {}

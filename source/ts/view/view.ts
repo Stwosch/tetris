@@ -1,7 +1,7 @@
-import { DOM } from '../dom-elements';
-import { times } from '../useful-functions';
-import { Block, EmptyBlock } from '../block';
-import { Vector } from '../vector';
+import { DOM } from '../dom-elements/dom-elements';
+import { times } from '../useful-functions/useful-functions';
+import { Block, EmptyBlock } from '../block/block';
+import { Vector } from '../vector/vector';
 
 export class View {
 
@@ -16,7 +16,7 @@ export class View {
         el.className = "block block__" + type;
     }
 
-    renderAllTemplate(area: Block[][]) {
+    renderArea(area: Block[][]): void {
 
         let id: number = 0;
         const flattened = area.reduce( (sum: Block[], value: Block[]) => sum.concat(value), [] );
@@ -27,7 +27,7 @@ export class View {
 
     renderBlock(block: Block) {
         
-        block.vectors.forEach((vector: Vector) => {
+        block.position.forEach((vector: Vector) => {
             
             const id = vector.getId();
             const el = this._getBlockById(id);
