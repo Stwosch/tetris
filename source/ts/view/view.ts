@@ -25,26 +25,13 @@ export class View {
         DOM.board.innerHTML = output;
     }
 
-    renderBlock(block: Block) {
+    renderBlock(blockType: string, blockPosition: Vector[]) {
         
-        block.position.forEach((vector: Vector) => {
+        blockPosition.forEach((vector: Vector) => {
             
             const id = vector.getId();
             const el = this._getBlockById(id);
-            this._addTypeToBlock(el, block.type);
-        });
-    }
-
-    removeBlock(vectors: Vector[]) {
-
-        const typeOfEmptyBlock = new EmptyBlock().type;
-
-        vectors.forEach((vector: Vector) => {
-            
-            const id = vector.getId();
-            const el = this._getBlockById(id);
-            this._addTypeToBlock(el, typeOfEmptyBlock);
-
+            this._addTypeToBlock(el, blockType);
         });
     }
 }

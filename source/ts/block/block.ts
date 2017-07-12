@@ -6,7 +6,6 @@ export class Block {
     protected _type: string;
     protected _width: number;
     protected _height: number;
-    protected _position: Vector[];
 
     constructor() {}
 
@@ -24,14 +23,6 @@ export class Block {
 
     get vectors() {
         return this._vectors;
-    }
-
-    get position() {
-        return this._position;
-    }
-
-    set position(vectors: Vector[]) {
-        this._position = vectors;
     }
 }
 

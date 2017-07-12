@@ -11,52 +11,47 @@ export class Controller {
     private _view: View;
     private _isCreatedBlock: boolean;
     private _currentBlock: Block;
+    private _currentBlockPosition: Vector[];
 
     constructor(model: Model, view: View) {
         this._model = model;
         this._view = view;
         this._isCreatedBlock = false;
     }
-/*
-    private _tryMoveBlock(block: Block, move: Vector) {
-        
-        if(this._model.canDropBlock(block.vectors, move)) {
-            const oldVectors = block.vectors;
-            block.vectors = block.getBlockPosition(move);
-
-            this._model.removeBlock(oldVectors);
-            this._model.addBlock(block);
-
-            this._view.removeBlock(oldVectors);
-            this._view.renderBlock(block);
-
-        } else if (move.y > 0) {
-            this._isCreatedBlock = false;
-        }
-        
-    }
-    */
 
     private _listeners(): { moving: () => void } {
 
         return {
             moving: () => {
 
-                function isSetCurrentBlock(block: Block): boolean {
-                    return !!block;
-                }
+                const isSetCurrentBlock: (block: Block) => boolean = block => !!block;
+                const moveBlock: (move: Vector) => void = move => {
+                    const result = this._model.tryMoveBlock(this._currentBlockPosition, move);
+                    
+                    if(result) {
+                        const oldPosition = this._currentBlockPosition;
+                        this._currentBlockPosition = this._currentBlockPosition.map((vector: Vector) => vector.plus(move));
+            
+                        this._model.removeBlockOnArea(oldPosition);
+                        this._model.addBlockOnArea(this._currentBlock, this._currentBlockPosition);
+                            
+                        this._view.renderBlock(new EmptyBlock().type, oldPosition);
+                        this._view.renderBlock(this._currentBlock.type, this._currentBlockPosition);
+                    }
+                };
+
 
                 window.addEventListener('keydown', e => {
-                        /*
+                        
                     if(!isSetCurrentBlock(this._currentBlock)) {
                         return;
                     }
 
                     switch(e.keyCode) {
-                        case 37: this._tryMoveBlock(this._currentBlock, new Vector(-1, 0)); break;
-                        case 39: this._tryMoveBlock(this._currentBlock, new Vector(1, 0)); break;
+                        case 37: moveBlock(new Vector(-1, 0)); break;
+                        case 39: moveBlock(new Vector(1, 0)); break;
                     }  
-                    */
+                    
                 });
                 
             }  
@@ -69,7 +64,21 @@ export class Controller {
 
         const handleGame: () => void = () => {
             if(this._isCreatedBlock) {
-               // this._tryMoveBlock(this._currentBlock, new Vector(0, 1));
+
+                const dropDown: Vector = new Vector(0, 1);
+
+                if(this._model.canDropBlock(this._currentBlockPosition, dropDown)) {
+                    const oldPosition = this._currentBlockPosition;
+                    this._currentBlockPosition = this._currentBlockPosition.map((vector: Vector) => vector.plus(dropDown));
+        
+                    this._model.removeBlockOnArea(oldPosition);
+                    this._model.addBlockOnArea(this._currentBlock, this._currentBlockPosition);
+                        
+                    this._view.renderBlock(new EmptyBlock().type, oldPosition);
+                    this._view.renderBlock(this._currentBlock.type, this._currentBlockPosition);
+                } else {
+                    this._isCreatedBlock = false;
+                }
             } else {
 
                 const randomBlock: Block = this._model.getRandomBlock();
@@ -78,10 +87,10 @@ export class Controller {
                 if(canCreateBlock(freeSpaces)) {
                     
                     const freeSpace: Vector[] = this._model.getRandomFreeSpace(freeSpaces);
-                    randomBlock.position = freeSpace;
-                    this._view.renderBlock(randomBlock);
+                    this._view.renderBlock(randomBlock.type, freeSpace);
                     this._currentBlock = randomBlock;
                     this._isCreatedBlock = true;
+                    this._currentBlockPosition = freeSpace;
 
                 } else {
                     console.log('end game');
@@ -91,10 +100,7 @@ export class Controller {
         
         this._listeners().moving();
         
-        //return setInterval(handleGame, 500);
-
-        handleGame()
-        return 1;
+        return setInterval(handleGame, 500);
     }
 
     init(): void {

@@ -22,74 +22,6 @@ export class Model {
         return this._board;
     }
 
-    private _filterProperVectorToMoveDown(properVectors: Vector[], vector: Vector) {
-
-        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.x === vector.x);
-
-        if(pVectorIndex === -1) {
-
-            properVectors.push(new Vector(vector.x, vector.y));
-
-        } else if(properVectors[pVectorIndex].y < vector.y) {
-
-            properVectors[pVectorIndex].y = vector.y;
-        }
-    }
-
-    private _filterProperVectorToMoveRight(properVectors: Vector[], vector: Vector) {
-
-        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.y === vector.y);
-
-        if(pVectorIndex === -1) {
-
-            properVectors.push(new Vector(vector.x, vector.y));
-
-        } else if(properVectors[pVectorIndex].x < vector.x) {
-
-            properVectors[pVectorIndex].x = vector.x;
-        }
-    }
-
-    private _filterProperVectorToMoveLeft(properVectors: Vector[], vector: Vector) {
-
-        const pVectorIndex: number = properVectors.findIndex((pVector: Vector) => pVector.y === vector.y);
-
-        if(pVectorIndex === -1) {
-
-            properVectors.push(new Vector(vector.x, vector.y));
-
-        } else if(properVectors[pVectorIndex].x > vector.x) {
-
-            properVectors[pVectorIndex].x = vector.x;
-        }
-    }
-
-    private _filterProperVectorToMove(properVectors: Vector[], vector: Vector, move: Vector) {
-
-        if(move.y === 1) {
-            this._filterProperVectorToMoveDown(properVectors, vector);
-        } else if(move.x === 1) {
-            this._filterProperVectorToMoveRight(properVectors, vector);
-        } else if(move.x === -1) {
-            this._filterProperVectorToMoveLeft(properVectors, vector);
-        }
-    }
-
-    canDropBlock(positions: Vector[], move: Vector) {
-
-        const properVectors: Vector[] = [];
-
-        positions.forEach((vector: Vector) => this._filterProperVectorToMove(properVectors, vector, move) );
-        
-        const droppedVectors = properVectors.map((vector: Vector) => vector.plus(move));
-
-        return this._isPositionFree(droppedVectors);
-    }
-
-    removeBlock(vectors: Vector[]) {
-        vectors.forEach((vector: Vector) => this._board.setBlockOnArea(vector, new EmptyBlock) );
-    }
-
     private _isPositionFree(vectors: Vector[]): boolean {
 
         const doesVectorFitArray: (array: any[][], vector: Vector) => boolean = (array, vector) => vector.y < array.length && vector.y >= 0 && vector.x >= 0 && vector.x < array[0].length;
@@ -134,7 +66,61 @@ export class Model {
         return randomValueFromArray(freeSpaces);
     }
 
-    createBlockOnBoard(block: Block): void {
-        block.position.forEach((vector: Vector) => this._board.setBlockOnArea(vector, block));
+    canDropBlock(blockPosition: Vector[], dropDown: Vector) {
+
+        const borderBottomVectors: Vector[] = [];
+        const sieveBorderBottomVectors:  (container: Vector[], vector: Vector) => void = (container, vector) => {
+
+            const containerVectorIndex: number = container.findIndex((containerVector: Vector) => containerVector.x === vector.x);
+            const doesNotVectorExistInContainer: (index: number) => boolean = index => index === -1;
+            const isVectorHigherThanInContainer: (vector: Vector, vectorInContainer: Vector) => boolean = (vector, vectorInContainer) => vector.y > vectorInContainer.y;
+    
+            if(doesNotVectorExistInContainer(containerVectorIndex)) {
+    
+                container.push(new Vector(vector.x, vector.y));
+    
+            } else if(isVectorHigherThanInContainer(vector, container[containerVectorIndex])) {
+    
+                container[containerVectorIndex].y = vector.y;
+            }
+        }
+
+        blockPosition.forEach((vector: Vector) => sieveBorderBottomVectors(borderBottomVectors, vector));
+        
+        const droppedVectors: Vector[] = borderBottomVectors.map((vector: Vector) => vector.plus(dropDown));
+
+        return this._isPositionFree(droppedVectors);
+    }
+
+    removeBlockOnArea(vectors: Vector[]) {
+        vectors.forEach((vector: Vector) => this._board.setBlockOnArea(vector, new EmptyBlock) );
+    }
+
+    addBlockOnArea(block: Block, blockPosition: Vector[]): void {
+        blockPosition.forEach((vector: Vector) => this._board.setBlockOnArea(vector, block));
+    }
+    
+    tryMoveBlock(blockPosition: Vector[], move: Vector) {
+        const extremeVectors: Vector[] = [];
+        const sieveExtremeVectors:  (container: Vector[], vector: Vector) => void = (container, vector) => {
+
+            const containerVectorIndex: number = container.findIndex((containerVector: Vector) => containerVector.y === vector.y);
+            const doesNotVectorExistInContainer: (index: number) => boolean = index => index === -1;
+            const isVectorFavorableThanInContainer: (vector: Vector, vectorInContainer: Vector) => boolean = (vector, vectorInContainer) => move.x < 0 && vector.x < vectorInContainer.x || move.x > 0 && vector.x > vectorInContainer.x;
+    
+            if(doesNotVectorExistInContainer(containerVectorIndex)) {
+    
+                container.push(new Vector(vector.x, vector.y));
+    
+            } else if(isVectorFavorableThanInContainer(vector, container[containerVectorIndex])) {
+    
+                container[containerVectorIndex].x = vector.x;
+            }
+        }
+
+        blockPosition.forEach((vector: Vector) => sieveExtremeVectors(extremeVectors, vector));
+        const movedVectors: Vector[] = extremeVectors.map((vector: Vector) => vector.plus(move));
+
+        return this._isPositionFree(movedVectors);
     }
 }
